@@ -53,13 +53,14 @@ def locateEntryAndExit():
 '''
 	Função que numero os tiles de acordo com sua distância da saída
 '''
-def gradeTiles(start, end, _labirinth):	
+def gradeTiles(start, end):	
+	print
 	def verifyAdjacents(i,j):
 		try:
 			if(j-1 < 0): 
 				#raize exception to stop python from reading list backwards
 				raise Exception('index out of range')
-			up = _labirinth[i][j-1]
+			up = labirinth[i][j-1]
 			if(up != -1):
 				graded_tiles.append({'row': i,'col': j-1,'val': up+1})
 		except Exception as err:
@@ -67,10 +68,10 @@ def gradeTiles(start, end, _labirinth):
 			#print('err', err)
 			pass
 		try:
-			if(j+1 > len(_labirinth[i])): 
+			if(j+1 > len(labirinth[i])): 
 				#raize exception to stop python from reading list backwards
 				raise Exception('index out of range')
-			down = _labirinth[i][j+1]
+			down = labirinth[i][j+1]
 			if(down != -1):
 				graded_tiles.append({'row': i,'col': j+1,'val': down+1})
 		except Exception as err:
@@ -81,7 +82,7 @@ def gradeTiles(start, end, _labirinth):
 			if(i-1 < 0): 
 				#raize exception to stop python from reading list backwards
 				raise Exception('index out of range')
-			left = _labirinth[i-1][j]
+			left = labirinth[i-1][j]
 			if(left != -1):
 				graded_tiles.append({'row': i-1,'col': j,'val': left+1})
 		except Exception as err:
@@ -89,50 +90,58 @@ def gradeTiles(start, end, _labirinth):
 			#print('err', err)
 			pass
 		try:
-			if(i+1 > len(_labirinth)): 
+			if(i+1 > len(labirinth)): 
 				#raize exception to stop python from reading list backwards
 				raise Exception('index out of range')
-			right = _labirinth[i+1][j]
+			right = labirinth[i+1][j]
 			if(right != -1):
 				graded_tiles.append({'row': i+1,'col': j,'val': right+1})
 		except Exception as err:
 			#this will deal with index out of range err
 			#print('err', err)
-			pass	
-	
-	if(len(graded_tiles) <= 0):
+			pass
+
+		if(i == end['row'] and j == end['col']):
+			return True
+		else: 
+			return False
+		print(graded_tiles)
+		#end  verifyAdjacents
+
+	if(len(graded_tiles) == 0):
 		verifyAdjacents(start['row'], start['col'])
-	
+		gradeTiles(start, end)
 	else:
 		for item in graded_tiles: 
-			print(item)
-
+			exit_found = verifyAdjacents(item['row'], item['col'])
+			print(exit_found)
+	print(graded_tiles)
 '''
 	for row in labirinth:
 		for tile in row:
 			try:
-				up = _labirinth[i][j-1]
+				up = labirinth[i][j-1]
 				if(up != -1 and graded_tiles['{} {}'.format(i, j)]):
 					graded_tiles.update({'{} {}'.format(i, j): {'row': i,'col': j,'val': up+1}})
 			except Exception as err:
 				#this will deal with index out of range err
 				pass
 			try:
-				down = _labirinth[i][j+1]
+				down = labirinth[i][j+1]
 				if(down != -1):
 					graded_tiles.update({'{} {}'.format(i, j): {'row': i,'col': j,'val': down+1}})
 			except Exception as err:
 				#this will deal with index out of range err
 				pass	
 			try:
-				left = _labirinth[i-1][j]
+				left = labirinth[i-1][j]
 				if(left != -1):
 					graded_tiles.update({'{} {}'.format(i, j): {'row': i,'col': j,'val': left+1}})
 			except Exception as err:
 				#this will deal with index out of range err
 				pass
 			try:
-				right = _labirinth[i+1][j]
+				right = labirinth[i+1][j]
 				if(right != -1):
 					graded_tiles.update({'{} {}'.format(i, j): {'row': i,'col': j,'val': right+1}})
 			except Exception as err:
@@ -142,8 +151,7 @@ def gradeTiles(start, end, _labirinth):
 
 setup()
 locateEntryAndExit()
-gradeTiles(entry_tile, exit_tile, labirinth)
-gradeTiles(entry_tile, exit_tile, labirinth)
+gradeTiles(entry_tile, exit_tile)
 
 '''
 	Se graded_tiles for vazio:
