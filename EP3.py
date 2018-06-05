@@ -4,7 +4,7 @@
 labirinth = []
 entry_tile = {}
 exit_tile = {}
-graded_tiles = []
+graded_tiles = {}
 ppp = 0
 
 def setup():
@@ -81,7 +81,7 @@ def gradeTiles():
 			else:
 				up = {'row': item['row'] - 1, 'col': item['col'], 'val': labirinth[item['row'] - 1][item['col']]+1}
 				if(up['val'] != -1 and up['val'] >= item['val']):
-					graded_tiles.append(up)
+					graded_tiles.update({len(graded_tiles): up})
 		except Exception as err:
 			#this will deal with index out of range err
 			#print('err1', err)
@@ -93,7 +93,7 @@ def gradeTiles():
 			else:
 				down = {'row': item['row'] + 1, 'col': item['col'], 'val': labirinth[item['row'] + 1][item['col']]+1}
 				if(down['val'] != -1 and down['val'] >= item['val']):
-					graded_tiles.append(down)
+					graded_tiles.update({len(graded_tiles): down})
 		except Exception as err:
 			#this will deal with index out of range err
 			#print('err2', err)
@@ -105,7 +105,7 @@ def gradeTiles():
 			else:
 				left = {'row': item['row'], 'col': item['col'] - 1, 'val': labirinth[item['row']][item['col'] - 1]+1}
 				if(left['val'] != -1 and left['val'] >= item['val']):
-					graded_tiles.append(left)
+					graded_tiles.update({len(graded_tiles): left})
 		except Exception as err:
 			#this will deal with index out of range err
 			#print('err3', err)
@@ -117,12 +117,13 @@ def gradeTiles():
 			else:
 				right = {'row': item['row'], 'col': item['col'] + 1, 'val': labirinth[item['row']][item['col'] + 1]+1}
 				if(right['val'] != -1 and right['val'] >= item['val']):
-					graded_tiles.append(right)
+					graded_tiles.update({len(graded_tiles): right})
 		except Exception as err:
 			#this will deal with index out of range err
 			#print('err4', err)
 			pass
 
+		print('1',item)
 		if(item['row'] == exit_tile['row'] and item['col'] == exit_tile['col']):
 			return True
 		else: 
@@ -137,10 +138,16 @@ def gradeTiles():
 		verifyAdjacents(entry_tile)
 		gradeTiles()
 	else:
-		for item in graded_tiles: 
+		print(graded_tiles)
+		var g = graded_tiles
+		for i in graded_tiles: 
 			if ppp > 50: break
-			exit_found = verifyAdjacents(item)
-			#print(exit_found)
+			print(graded_tiles[i])
+			input()
+			exit_found = verifyAdjacents(graded_tiles[i])
+			if(exit_found): break
+		else:
+			print('exit was found')
 	print('graded_tiles: ', graded_tiles)
 '''
 	for row in labirinth:
