@@ -8,7 +8,6 @@ graded_tiles = {
 	'unvisited': [],
 	'visited': []
 }
-ppp = 0
 
 def setup():
 	
@@ -52,7 +51,7 @@ def locateExits():
 def isTileInsideMatrix(tile):
 	if(tile['row'] < 0): 
 		return False
-	if(tile['row'] + 1 >= len(labirinth)): 
+	if(tile['row']> len(labirinth)): 
 		return False
 	if(tile['col'] < 0): 
 		return False
@@ -91,8 +90,6 @@ def gradeTiles(visited, unvisited):
 	for tile in unvisited:
 		addAdjacentToUnvisited(tile)
 	else:
-		print(graded_tiles)
-		#input()
 		if len(graded_tiles['unvisited']):
 			gradeTiles(graded_tiles['visited'], graded_tiles['unvisited'])
 	
@@ -103,7 +100,8 @@ def addAdjacentToUnvisited(tile):
 	else:
 		try:
 			_lab[tile['row'] - 1][tile['col']]
-		except:
+		except Exception as err:
+			#print(err)
 			pass
 		else:
 			up = {'row': tile['row'] - 1, 'col': tile['col'] , 'val': _lab[tile['row'] - 1][tile['col']]}
@@ -113,7 +111,8 @@ def addAdjacentToUnvisited(tile):
 				graded_tiles['unvisited'].append(up)
 		try:
 			_lab[tile['row'] + 1][tile['col']]
-		except:
+		except Exception as err:
+			#print(err)
 			pass
 		else:
 			down = {'row': tile['row'] + 1, 'col': tile['col'] , 'val': _lab[tile['row'] + 1][tile['col']]}
@@ -123,7 +122,8 @@ def addAdjacentToUnvisited(tile):
 				graded_tiles['unvisited'].append(down)
 		try:
 			_lab[tile['row']][tile['col'] - 1]
-		except:
+		except Exception as err:
+			#print(err)
 			pass
 		else:
 			left = {'row': tile['row'], 'col': tile['col'] - 1, 'val': _lab[tile['row']][tile['col'] - 1]}
@@ -133,7 +133,8 @@ def addAdjacentToUnvisited(tile):
 				graded_tiles['unvisited'].append(left)
 		try:
 			_lab[tile['row']][tile['col'] + 1]
-		except:
+		except Exception as err:
+			#print(err)
 			pass
 		else:
 			right = {'row': tile['row'], 'col': tile['col'] + 1, 'val': _lab[tile['row']][tile['col'] + 1]}
@@ -145,13 +146,21 @@ def addAdjacentToUnvisited(tile):
 		graded_tiles['visited'].append(tile)
 		del graded_tiles['unvisited'][tile_idx]
 		
-
+def printLabirinth(lab):
+	for row in lab:
+		for tile in row:
+			print('{:2d}'.format(tile), end = ' ')
+		else:
+			print()
 setup()
-exit_tile = {'row': 0, 'col': 0, 'val': 1}
+exit_tile = {'row': 0, 'col': 3, 'val': 1}
 graded_tiles['unvisited'].append(exit_tile)
 _lab = labirinth
+_lab[0][3] = 1
+printLabirinth(_lab)
+print('-----------------------')
 gradeTiles(graded_tiles['visited'], graded_tiles['unvisited'])
-print(graded_tiles)
+printLabirinth(_lab)
 
 '''
 	for row in labirinth:
