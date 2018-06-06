@@ -2,9 +2,12 @@
 
 #Define global variables
 labirinth = []
-entry_tile = {}
+_lab = []
 exit_tile = {}
-graded_tiles = {}
+graded_tiles = {
+	'unvisited': [],
+	'visited': []
+}
 ppp = 0
 
 def setup():
@@ -29,31 +32,10 @@ def setup():
 		except Exception as err:
 			print(err)
 	#print(labirinth)
+	_lab = labirinth
 	return labirinth
 
-'''
-	Função criada para determinal qual o ponto de saída do labirinto
-	Definições:
-		- A entrada e saída é representada com o número zero
-		- A entrada deve estar localizada na primeira linha da matriz
-		- A saída deve estar localizada na ultima linha da matriz
-		- A Entrada é sempre o primeiro zero da primeira linha
-		- A saída é sempre o ultimo zero da ultima linha
-'''
-def locateEntryAndExit():
-	for k in range(len(labirinth[0])):
-		if(labirinth[0][k] == 0):
-			entry_tile.update({'row': 0, 'col': k, 'val': 0})
-			break
-	else:
-		labirinth[0][0] = 0;
-		entry_tile.update({'row': 0, 'col': 0, 'val': 0})
-		print('Nenhuma porta de entrada encontrada...')
-		print('Plantando explosivos...')
-		print('Porta criada na posição (0, 0)')
-		
-
-
+def locateExits():
 	i = len(labirinth) -1
 	for j in range(len(labirinth[i])):
 		if(labirinth[i][j] == 0):
@@ -66,89 +48,111 @@ def locateEntryAndExit():
 		print('Nenhuma porta de saída encontrada...')
 		print('Plantando explosivos...')
 		print('Porta criada na posição ({}, {})'.format(exit_tile['row'], exit_tile['col']))
-		
+
+def isTileInsideMatrix(tile):
+	if(tile['row'] < 0): 
+		return False
+	if(tile['row'] + 1 >= len(labirinth)): 
+		return False
+	if(tile['col'] < 0): 
+		return False
+	if(tile['col'] > len(labirinth[tile['row']])): 
+		return False
+	return True
+
+def getTileIndex(tile, list):
+	try:
+		tile['row'] 
+		tile['col']
+	except: 
+		print('Tile informado não possui row ou col')
+		return False
+
+	i=-1
+	for obj in list:
+		i +=1
+		try:
+			obj['row'] 
+			obj['col']
+			obj['val']
+		except: 
+			del list[i]
+			continue
+		else:
+			if(obj['row'] == tile['row'] and obj['col'] == tile['col']): #they are at the same position
+				return i
+	else: 
+		return -1
 
 '''
 	Função que numero os tiles de acordo com sua distância da saída
 '''
-def gradeTiles():	
-	print
-	def verifyAdjacents(item): #item contains row, col, val
-		try:
-			if((item['row'] - 1) < 0): 
-				#raize exception to stop python from reading list backwards
-				raise Exception('index out of range')
-			else:
-				up = {'row': item['row'] - 1, 'col': item['col'], 'val': labirinth[item['row'] - 1][item['col']]+1}
-				if(up['val'] != -1 and up['val'] >= item['val']):
-					graded_tiles.update({len(graded_tiles): up})
-		except Exception as err:
-			#this will deal with index out of range err
-			#print('err1', err)
-			pass
-		try:
-			if(item['row'] + 1 >= len(labirinth)): 
-				#raize exception to stop python from reading list backwards
-				raise Exception('index out of range')
-			else:
-				down = {'row': item['row'] + 1, 'col': item['col'], 'val': labirinth[item['row'] + 1][item['col']]+1}
-				if(down['val'] != -1 and down['val'] >= item['val']):
-					graded_tiles.update({len(graded_tiles): down})
-		except Exception as err:
-			#this will deal with index out of range err
-			#print('err2', err)
-			pass	
-		try:
-			if(item['col'] - 1 < 0): 
-				#raize exception to stop python from reading list backwards
-				raise Exception('index out of range')
-			else:
-				left = {'row': item['row'], 'col': item['col'] - 1, 'val': labirinth[item['row']][item['col'] - 1]+1}
-				if(left['val'] != -1 and left['val'] >= item['val']):
-					graded_tiles.update({len(graded_tiles): left})
-		except Exception as err:
-			#this will deal with index out of range err
-			#print('err3', err)
-			pass
-		try:
-			if(item['col'] + 1 >= len(labirinth[item['row']-1])): 
-				#raize exception to stop python from reading list backwards
-				raise Exception('index out of range')
-			else:
-				right = {'row': item['row'], 'col': item['col'] + 1, 'val': labirinth[item['row']][item['col'] + 1]+1}
-				if(right['val'] != -1 and right['val'] >= item['val']):
-					graded_tiles.update({len(graded_tiles): right})
-		except Exception as err:
-			#this will deal with index out of range err
-			#print('err4', err)
-			pass
-
-		print('1',item)
-		if(item['row'] == exit_tile['row'] and item['col'] == exit_tile['col']):
-			return True
-		else: 
-			global ppp
-			ppp += 1
-			return False
-		#end  verifyAdjacents
-
-
-	if(len(graded_tiles) == 0):
-		print('start')
-		verifyAdjacents(entry_tile)
-		gradeTiles()
+def gradeTiles(visited, unvisited):	
+	for tile in unvisited:
+		addAdjacentToUnvisited(tile)
 	else:
 		print(graded_tiles)
-		var g = graded_tiles
-		for i in graded_tiles: 
-			if ppp > 50: break
-			print(graded_tiles[i])
-			input()
-			exit_found = verifyAdjacents(graded_tiles[i])
-			if(exit_found): break
+		#input()
+		if len(graded_tiles['unvisited']):
+			gradeTiles(graded_tiles['visited'], graded_tiles['unvisited'])
+	
+def addAdjacentToUnvisited(tile):
+	tile_idx = getTileIndex(tile, graded_tiles['unvisited'])
+	if(tile_idx == -1): #tile not in the list
+		return
+	else:
+		try:
+			_lab[tile['row'] - 1][tile['col']]
+		except:
+			pass
 		else:
-			print('exit was found')
-	print('graded_tiles: ', graded_tiles)
+			up = {'row': tile['row'] - 1, 'col': tile['col'] , 'val': _lab[tile['row'] - 1][tile['col']]}
+			if(up['val'] == 0 and isTileInsideMatrix(up) and getTileIndex(up, graded_tiles['unvisited']) == -1 and getTileIndex(up, graded_tiles['visited']) == -1): #tile not graded, and is inside matrix, and is not in unvisited list
+				up['val'] = tile['val'] + 1;
+				_lab[tile['row'] - 1][tile['col']] = up['val']
+				graded_tiles['unvisited'].append(up)
+		try:
+			_lab[tile['row'] + 1][tile['col']]
+		except:
+			pass
+		else:
+			down = {'row': tile['row'] + 1, 'col': tile['col'] , 'val': _lab[tile['row'] + 1][tile['col']]}
+			if(down['val'] == 0 and isTileInsideMatrix(down) and getTileIndex(down, graded_tiles['unvisited']) == -1 and getTileIndex(down, graded_tiles['visited']) == -1): #tile not graded, and is inside matrix, and is not in unvisited list
+				down['val'] = tile['val'] + 1;
+				_lab[tile['row'] + 1][tile['col']] = down['val']
+				graded_tiles['unvisited'].append(down)
+		try:
+			_lab[tile['row']][tile['col'] - 1]
+		except:
+			pass
+		else:
+			left = {'row': tile['row'], 'col': tile['col'] - 1, 'val': _lab[tile['row']][tile['col'] - 1]}
+			if(left['val'] == 0 and isTileInsideMatrix(left) and getTileIndex(left, graded_tiles['unvisited']) == -1 and getTileIndex(left, graded_tiles['visited']) == -1): #tile not graded, and is inside matrix, and is not in unvisited list
+				left['val'] = tile['val'] + 1;
+				_lab[tile['row']][tile['col'] - 1] = left['val']
+				graded_tiles['unvisited'].append(left)
+		try:
+			_lab[tile['row']][tile['col'] + 1]
+		except:
+			pass
+		else:
+			right = {'row': tile['row'], 'col': tile['col'] + 1, 'val': _lab[tile['row']][tile['col'] + 1]}
+			if(right['val'] == 0 and isTileInsideMatrix(right) and getTileIndex(right, graded_tiles['unvisited']) == -1 and getTileIndex(right, graded_tiles['visited']) == -1): #tile not graded, and is inside matrix, and is not in unvisited list
+				right['val'] = tile['val'] + 1;
+				_lab[tile['row']][tile['col'] + 1] = right['val']
+				graded_tiles['unvisited'].append(right)
+
+		graded_tiles['visited'].append(tile)
+		del graded_tiles['unvisited'][tile_idx]
+		
+
+setup()
+exit_tile = {'row': 0, 'col': 0, 'val': 1}
+graded_tiles['unvisited'].append(exit_tile)
+_lab = labirinth
+gradeTiles(graded_tiles['visited'], graded_tiles['unvisited'])
+print(graded_tiles)
+
 '''
 	for row in labirinth:
 		for tile in row:
@@ -182,18 +186,55 @@ def gradeTiles():
 				pass
 '''
 
-setup()
-locateEntryAndExit()
-gradeTiles()
 
 '''
-	Se graded_tiles for vazio:
-		Leia o tile inicial (descobrir os dois index)
-		adicionar os 4 tiles ao redor no dict graded_tiles
+try:
+	if((item['row'] - 1) < 0): 
+		#raize exception to stop python from reading list backwards
+		raise Exception('index out of range')
 	else:
-		for tile in graded_tiles
-			adicionar os 4 tiles ao redor no dict graded_tiles
-			if (tile === final) stop. Cheguei ao resultado return graded_tiles
+		up = {'row': item['row'] - 1, 'col': item['col'], 'val': labirinth[item['row'] - 1][item['col']]+1}
+		if(up['val'] != -1 and up['val'] >= item['val']):
+			graded_tiles.update({len(graded_tiles): up})
+except Exception as err:
+	#this will deal with index out of range err
+	#print('err1', err)
+	pass
+try:
+	if(item['row'] + 1 >= len(labirinth)): 
+		#raize exception to stop python from reading list backwards
+		raise Exception('index out of range')
+	else:
+		down = {'row': item['row'] + 1, 'col': item['col'], 'val': labirinth[item['row'] + 1][item['col']]+1}
+		if(down['val'] != -1 and down['val'] >= item['val']):
+			graded_tiles.update({len(graded_tiles): down})
+except Exception as err:
+	#this will deal with index out of range err
+	#print('err2', err)
+	pass	
+try:
+	if(item['col'] - 1 < 0): 
+		#raize exception to stop python from reading list backwards
+		raise Exception('index out of range')
+	else:
+		left = {'row': item['row'], 'col': item['col'] - 1, 'val': labirinth[item['row']][item['col'] - 1]+1}
+		if(left['val'] != -1 and left['val'] >= item['val']):
+			graded_tiles.update({len(graded_tiles): left})
+except Exception as err:
+	#this will deal with index out of range err
+	#print('err3', err)
+	pass
+try:
+	if(item['col'] + 1 >= len(labirinth[item['row']-1])): 
+		#raize exception to stop python from reading list backwards
+		raise Exception('index out of range')
+	else:
+		right = {'row': item['row'], 'col': item['col'] + 1, 'val': labirinth[item['row']][item['col'] + 1]+1}
+		if(right['val'] != -1 and right['val'] >= item['val']):
+			graded_tiles.update({len(graded_tiles): right})
+except Exception as err:
+	#this will deal with index out of range err
+	#print('err4', err)
+	pass
 
-	criar funççao para imprimir o graded_tiles
 '''
