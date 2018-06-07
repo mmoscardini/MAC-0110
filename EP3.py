@@ -55,7 +55,6 @@ def locateExits():
 			j = 0
 			for tile in row[::len(row)-1]:
 				if(tile == 0):
-					print('ITS 0000')
 					entry_tile = {'row': i, 'col':j, 'val': 1}
 					graded_tiles['unvisited'].append(entry_tile)
 					_lab[i][j] = 1
@@ -66,6 +65,21 @@ def locateExits():
 					graded_tiles = { 'unvisited': [], 'visited': [] }
 				j = len(row)-1
 			i += 1
+		else:
+			last_idx = len(labirinth)-1
+			i= 0
+			for tile in labirinth[last_idx]:
+				if(tile == 0):
+					entry_tile = {'row': last_idx, 'col': i, 'val': 1}
+					graded_tiles['unvisited'].append(entry_tile)
+					_lab[last_idx][i] = 1
+					gradeTiles(graded_tiles['visited'], graded_tiles['unvisited'])
+					printLabirinth(_lab)
+					print('-----------------------')
+					_lab = copy.deepcopy(labirinth)
+					graded_tiles = { 'unvisited': [], 'visited': [] }
+				i += 1
+
 
 def isTileInsideMatrix(tile):
 	if(tile['row'] < 0): 
