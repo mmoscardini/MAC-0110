@@ -5,7 +5,7 @@ import copy
 #Define global variables
 labirinth = []
 _lab = []
-exit_tile = {}
+entry_tile = {}
 graded_tiles = {
 	'unvisited': [],
 	'visited': []
@@ -39,18 +39,34 @@ def locateExits():
 	global graded_tiles
 	i = 0
 	for tile in labirinth[0]:
-		print(tile)
 		if(tile == 0):
-			print('ITS 0000')
-			exit_tile = {'row': 0, 'col': i, 'val': 1}
-			graded_tiles['unvisited'].append(exit_tile)
+			entry_tile = {'row': 0, 'col': i, 'val': 1}
+			graded_tiles['unvisited'].append(entry_tile)
 			_lab[0][i] = 1
-			gradeTiles(graded_tiles['visited'], graded_tiles['unvisited'], _lab[:])
+			gradeTiles(graded_tiles['visited'], graded_tiles['unvisited'])
 			printLabirinth(_lab)
 			print('-----------------------')
 			_lab = copy.deepcopy(labirinth)
 			graded_tiles = { 'unvisited': [], 'visited': [] }
 		i += 1
+	else:
+		i=1
+		for row in labirinth[1:len(labirinth)-1]:
+			j = 0
+			for tile in row[::len(row)-1]:
+				if(tile == 0):
+					print('ITS 0000')
+					entry_tile = {'row': i, 'col':j, 'val': 1}
+					graded_tiles['unvisited'].append(entry_tile)
+					_lab[i][j] = 1
+					gradeTiles(graded_tiles['visited'], graded_tiles['unvisited'])
+					printLabirinth(_lab)
+					print('-----------------------')
+					_lab = copy.deepcopy(labirinth)
+					graded_tiles = { 'unvisited': [], 'visited': [] }
+				j = len(row)-1
+			i += 1
+
 def isTileInsideMatrix(tile):
 	if(tile['row'] < 0): 
 		return False
@@ -89,61 +105,61 @@ def getTileIndex(tile, list):
 '''
 	Função que numero os tiles de acordo com sua distância da saída
 '''
-def gradeTiles(visited, unvisited, lab):	
+def gradeTiles(visited, unvisited):	
 	for tile in unvisited:
-		addAdjacentToUnvisited(tile, lab)
+		addAdjacentToUnvisited(tile)
 	else:
 		if len(graded_tiles['unvisited']):
-			gradeTiles(graded_tiles['visited'], graded_tiles['unvisited'], lab)
+			gradeTiles(graded_tiles['visited'], graded_tiles['unvisited'])
 	
-def addAdjacentToUnvisited(tile, lab):
+def addAdjacentToUnvisited(tile):
 	tile_idx = getTileIndex(tile, graded_tiles['unvisited'])
 	if(tile_idx == -1): #tile not in the list
 		return
 	else:
 		try:
-			lab[tile['row'] - 1][tile['col']]
+			_lab[tile['row'] - 1][tile['col']]
 		except Exception as err:
 			#print(err)
 			pass
 		else:
-			up = {'row': tile['row'] - 1, 'col': tile['col'] , 'val': lab[tile['row'] - 1][tile['col']]}
+			up = {'row': tile['row'] - 1, 'col': tile['col'] , 'val': _lab[tile['row'] - 1][tile['col']]}
 			if(up['val'] == 0 and isTileInsideMatrix(up) and getTileIndex(up, graded_tiles['unvisited']) == -1 and getTileIndex(up, graded_tiles['visited']) == -1): #tile not graded, and is inside matrix, and is not in unvisited list
 				up['val'] = tile['val'] + 1;
-				lab[tile['row'] - 1][tile['col']] = up['val']
+				_lab[tile['row'] - 1][tile['col']] = up['val']
 				graded_tiles['unvisited'].append(up)
 		try:
-			lab[tile['row'] + 1][tile['col']]
+			_lab[tile['row'] + 1][tile['col']]
 		except Exception as err:
 			#print(err)
 			pass
 		else:
-			down = {'row': tile['row'] + 1, 'col': tile['col'] , 'val': lab[tile['row'] + 1][tile['col']]}
+			down = {'row': tile['row'] + 1, 'col': tile['col'] , 'val': _lab[tile['row'] + 1][tile['col']]}
 			if(down['val'] == 0 and isTileInsideMatrix(down) and getTileIndex(down, graded_tiles['unvisited']) == -1 and getTileIndex(down, graded_tiles['visited']) == -1): #tile not graded, and is inside matrix, and is not in unvisited list
 				down['val'] = tile['val'] + 1;
-				lab[tile['row'] + 1][tile['col']] = down['val']
+				_lab[tile['row'] + 1][tile['col']] = down['val']
 				graded_tiles['unvisited'].append(down)
 		try:
-			lab[tile['row']][tile['col'] - 1]
+			_lab[tile['row']][tile['col'] - 1]
 		except Exception as err:
 			#print(err)
 			pass
 		else:
-			left = {'row': tile['row'], 'col': tile['col'] - 1, 'val': lab[tile['row']][tile['col'] - 1]}
+			left = {'row': tile['row'], 'col': tile['col'] - 1, 'val': _lab[tile['row']][tile['col'] - 1]}
 			if(left['val'] == 0 and isTileInsideMatrix(left) and getTileIndex(left, graded_tiles['unvisited']) == -1 and getTileIndex(left, graded_tiles['visited']) == -1): #tile not graded, and is inside matrix, and is not in unvisited list
 				left['val'] = tile['val'] + 1;
-				lab[tile['row']][tile['col'] - 1] = left['val']
+				_lab[tile['row']][tile['col'] - 1] = left['val']
 				graded_tiles['unvisited'].append(left)
 		try:
-			lab[tile['row']][tile['col'] + 1]
+			_lab[tile['row']][tile['col'] + 1]
 		except Exception as err:
 			#print(err)
 			pass
 		else:
-			right = {'row': tile['row'], 'col': tile['col'] + 1, 'val': lab[tile['row']][tile['col'] + 1]}
+			right = {'row': tile['row'], 'col': tile['col'] + 1, 'val': _lab[tile['row']][tile['col'] + 1]}
 			if(right['val'] == 0 and isTileInsideMatrix(right) and getTileIndex(right, graded_tiles['unvisited']) == -1 and getTileIndex(right, graded_tiles['visited']) == -1): #tile not graded, and is inside matrix, and is not in unvisited list
 				right['val'] = tile['val'] + 1;
-				lab[tile['row']][tile['col'] + 1] = right['val']
+				_lab[tile['row']][tile['col'] + 1] = right['val']
 				graded_tiles['unvisited'].append(right)
 
 		graded_tiles['visited'].append(tile)
