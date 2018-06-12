@@ -12,43 +12,47 @@ graded_tiles = {
 }
 
 def readMatrix():
-	
-	try:
-		#file_name = input('Nome do arquivo com as matrizes: ')
-		file = open('Matrizes.txt', 'r')
-	except:
-		print('Erro na abertura do arquivo Matrizes.txt')
-		return
-	i = 0
-	for line in file:
+	while True:
 		try:
-			v = line.split()
-			labirinth.append([])
-			for j in range(len(v)):
-				labirinth[i].append(int(v[j]))
-				#print("{:2d}".format(labirinth[i][j]) , end=' ')
-			i +=1
-			#print()
+			file_name = input('Entre com nome do arquivo com as matrizes: ')
+			file = open(file_name, 'r')
+		except:
+			print('Erro na abertura do arquivo Matrizes.txt')
+			continue
+		i = 0
+		for line in file:
+			try:
+				v = line.split()
+				labirinth.append([])
+				for j in range(len(v)):
+					labirinth[i].append(int(v[j]))
+				i +=1
 
-		except Exception as err:
-			print(err)
-	return labirinth
+			except Exception as err:
+				print(err)
+		print('Matriz labirinto com {} linhas por {} colunas'. format(len(labirinth), len(labirinth[0])))
+		printLabirinth(labirinth)
+		return labirinth
 
 def locateExits():
 	global _lab
 	global graded_tiles
+	global entry_tile
 	i = 0
+	#loop throw the first line
 	for tile in labirinth[0]:
 		if(tile == 0):
 			entry_tile = {'row': 0, 'col': i, 'val': 1}
 			graded_tiles['unvisited'].append(entry_tile)
 			_lab[0][i] = 1
 			gradeTiles(graded_tiles['visited'], graded_tiles['unvisited'])
-			printLabirinth(_lab)
-			print('-----------------------')
+			printResults()
+
+			#Reset values to original, so it can calculate for other exits
 			_lab = copy.deepcopy(labirinth)
 			graded_tiles = { 'unvisited': [], 'visited': [] }
 		i += 1
+	#check all first and last tile of middle rows
 	else:
 		i=1
 		for row in labirinth[1:len(labirinth)-1]:
@@ -59,12 +63,14 @@ def locateExits():
 					graded_tiles['unvisited'].append(entry_tile)
 					_lab[i][j] = 1
 					gradeTiles(graded_tiles['visited'], graded_tiles['unvisited'])
-					printLabirinth(_lab)
-					print('-----------------------')
+					printResults()
+
+					#Reset values to original, so it can calculate for other exits
 					_lab = copy.deepcopy(labirinth)
 					graded_tiles = { 'unvisited': [], 'visited': [] }
 				j = len(row)-1
 			i += 1
+			#check last row for exists
 		else:
 			last_idx = len(labirinth)-1
 			i= 0
@@ -74,8 +80,9 @@ def locateExits():
 					graded_tiles['unvisited'].append(entry_tile)
 					_lab[last_idx][i] = 1
 					gradeTiles(graded_tiles['visited'], graded_tiles['unvisited'])
-					printLabirinth(_lab)
-					print('-----------------------')
+					printResults()
+
+					#Reset values to original, so it can calculate for other exits
 					_lab = copy.deepcopy(labirinth)
 					graded_tiles = { 'unvisited': [], 'visited': [] }
 				i += 1
@@ -139,7 +146,7 @@ def addAdjacentToUnvisited(tile):
 		else:
 			up = {'row': tile['row'] - 1, 'col': tile['col'] , 'val': _lab[tile['row'] - 1][tile['col']]}
 			if(up['val'] == 0 and isTileInsideMatrix(up) and getTileIndex(up, graded_tiles['unvisited']) == -1 and getTileIndex(up, graded_tiles['visited']) == -1): #tile not graded, and is inside matrix, and is not in unvisited list
-				up['val'] = tile['val'] + 1;
+				up['val'] = tile['val'] + 1
 				_lab[tile['row'] - 1][tile['col']] = up['val']
 				graded_tiles['unvisited'].append(up)
 		try:
@@ -150,7 +157,7 @@ def addAdjacentToUnvisited(tile):
 		else:
 			down = {'row': tile['row'] + 1, 'col': tile['col'] , 'val': _lab[tile['row'] + 1][tile['col']]}
 			if(down['val'] == 0 and isTileInsideMatrix(down) and getTileIndex(down, graded_tiles['unvisited']) == -1 and getTileIndex(down, graded_tiles['visited']) == -1): #tile not graded, and is inside matrix, and is not in unvisited list
-				down['val'] = tile['val'] + 1;
+				down['val'] = tile['val'] + 1
 				_lab[tile['row'] + 1][tile['col']] = down['val']
 				graded_tiles['unvisited'].append(down)
 		try:
@@ -161,7 +168,7 @@ def addAdjacentToUnvisited(tile):
 		else:
 			left = {'row': tile['row'], 'col': tile['col'] - 1, 'val': _lab[tile['row']][tile['col'] - 1]}
 			if(left['val'] == 0 and isTileInsideMatrix(left) and getTileIndex(left, graded_tiles['unvisited']) == -1 and getTileIndex(left, graded_tiles['visited']) == -1): #tile not graded, and is inside matrix, and is not in unvisited list
-				left['val'] = tile['val'] + 1;
+				left['val'] = tile['val'] + 1
 				_lab[tile['row']][tile['col'] - 1] = left['val']
 				graded_tiles['unvisited'].append(left)
 		try:
@@ -172,7 +179,7 @@ def addAdjacentToUnvisited(tile):
 		else:
 			right = {'row': tile['row'], 'col': tile['col'] + 1, 'val': _lab[tile['row']][tile['col'] + 1]}
 			if(right['val'] == 0 and isTileInsideMatrix(right) and getTileIndex(right, graded_tiles['unvisited']) == -1 and getTileIndex(right, graded_tiles['visited']) == -1): #tile not graded, and is inside matrix, and is not in unvisited list
-				right['val'] = tile['val'] + 1;
+				right['val'] = tile['val'] + 1
 				_lab[tile['row']][tile['col'] + 1] = right['val']
 				graded_tiles['unvisited'].append(right)
 
@@ -185,6 +192,27 @@ def printLabirinth(lab):
 			print('{:2d}'.format(tile), end = ' ')
 		else:
 			print()
+
+def printResults():
+	print('Porta [{},{}]'.format(entry_tile['row'], entry_tile['col']))
+	print('Todos os possiveis caminhos até a porta [{},{}]'.format(entry_tile['row'], entry_tile['col']))
+	printLabirinth(_lab)
+	print()
+	farthest_away_tile =  {'row': 0, 'col': 0, 'val': 0}
+	for tile in graded_tiles['visited']:
+		if tile['val'] > farthest_away_tile['val']:
+			farthest_away_tile = tile
+	print('Posição com caminho mais distante da porta: [{},{}]'.format(farthest_away_tile['row'], farthest_away_tile['col']))
+	print('Posições sem caminho')
+	i=0
+	for row in _lab:
+		j = 0
+		for tile in row:
+			if tile == 0:
+				print('[{},{}]'.format(i,j))
+			j += 1
+		i+=1		
+	print('-----------------------------------------------------')
 
 readMatrix()
 _lab = copy.deepcopy(labirinth)
