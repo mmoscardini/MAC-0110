@@ -30,8 +30,10 @@ def readMatrix():
 
 			except Exception as err:
 				print(err)
+		print()
 		print('Matriz labirinto com {} linhas por {} colunas'. format(len(labirinth), len(labirinth[0])))
 		printLabirinth(labirinth)
+		print('-----------------------------------------------------')
 		return labirinth
 
 def locateExits():
