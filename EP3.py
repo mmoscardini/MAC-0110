@@ -1,7 +1,5 @@
 #!/usr/bin/env python3
 
-import copy
-
 #Define global variables
 labirinth = []
 _lab = []
@@ -51,7 +49,7 @@ def locateExits():
 			printResults()
 
 			#Reset values to original, so it can calculate for other exits
-			_lab = copy.deepcopy(labirinth)
+			_lab = [i[:] for i in labirinth]
 			graded_tiles = { 'unvisited': [], 'visited': [] }
 		i += 1
 	#check all first and last tile of middle rows
@@ -68,7 +66,7 @@ def locateExits():
 					printResults()
 
 					#Reset values to original, so it can calculate for other exits
-					_lab = copy.deepcopy(labirinth)
+					_lab = [i[:] for i in labirinth]
 					graded_tiles = { 'unvisited': [], 'visited': [] }
 				j = len(row)-1
 			i += 1
@@ -85,7 +83,7 @@ def locateExits():
 					printResults()
 
 					#Reset values to original, so it can calculate for other exits
-					_lab = copy.deepcopy(labirinth)
+					_lab = [i[:] for i in labirinth]
 					graded_tiles = { 'unvisited': [], 'visited': [] }
 				i += 1
 
@@ -217,6 +215,6 @@ def printResults():
 	print('-----------------------------------------------------')
 
 readMatrix()
-_lab = copy.deepcopy(labirinth)
+_lab = [i[:] for i in labirinth]
 locateExits()
 
